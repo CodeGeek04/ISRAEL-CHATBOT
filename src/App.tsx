@@ -226,14 +226,14 @@ function App() {
       : Config.API_HOST;
     const { response, abortController } = API.sendMessage(host, {
       text: finalTranscript,
-      parentMessageId: conversationRef.current.currentMessageId || undefined,
+      // parentMessageId: conversationRef.current.currentMessageId || undefined,
     });
     abortRef.current = abortController;
 
     response
       .then((res) => res.json())
       .then((res: CreateChatGPTMessageResponse) => {
-        conversationRef.current.currentMessageId = res.messageId;
+        // conversationRef.current.currentMessageId = res.messageId;
         setMessages((oldMessages) => [
           ...oldMessages,
           { type: 'response', text: res.answer },
