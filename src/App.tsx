@@ -311,7 +311,7 @@ function App() {
       <header className="flex flex-col items-center lg:flex-row lg:justify-between lg:mb-4">
         {/* w-64 so text will break after ChatGPT */}
         <h1 className="font-title text-3xl text-center w-64 lg:w-auto">
-          ChatGPT With Voice
+          Chat With Yocheved
           <div className="inline-block w-4 h-7 ml-2 align-middle bg-dark/40 animate-blink" />
         </h1>
       </header>
