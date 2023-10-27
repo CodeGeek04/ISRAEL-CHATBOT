@@ -226,7 +226,7 @@ function App() {
       : Config.API_HOST;
     const { response, abortController } = API.sendMessage(host, {
       text: finalTranscript,
-      parentMessageId: conversationRef.current.currentMessageId || "new-id",
+      parentMessageId: conversationRef.current.currentMessageId || undefined,
     });
     abortRef.current = abortController;
 
