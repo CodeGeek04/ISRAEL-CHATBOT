@@ -8,7 +8,8 @@ class APIClient {
     const abortController = new AbortController();
 
     console.log("Host: ", host);
-    const response = fetch(`${host}/api/chatbot`, {
+    // const response = fetch(`${host}/api/chatbot`, {
+    const response = fetch(`${host}/chatbot`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
