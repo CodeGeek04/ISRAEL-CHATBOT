@@ -276,7 +276,7 @@ function App() {
       const role = messageObject.type === "prompt" ? "user" : "assistant";
       console.log("Role: ", role);
       console.log("Message: ", messageObject.text);
-      if (messageObject.message === undefined) {
+      if (messageObject.text === undefined) {
         return {role, content: ""}
       }
       return { role, content: messageObject.text };
