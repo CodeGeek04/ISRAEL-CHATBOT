@@ -15,6 +15,7 @@ class APIClient {
       body: JSON.stringify(payload),
       signal: abortController.signal,
     });
+    console.log("Response: ", response);
 
     return { response, abortController };
   }
