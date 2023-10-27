@@ -229,7 +229,8 @@ function App() {
       parentMessageId: conversationRef.current.currentMessageId || undefined,
     });
     abortRef.current = abortController;
-
+    console.log('Abort controller:', abortController);
+    console.log("Response", response);
     response
       .then((res) => res.json())
       .then((res: CreateChatGPTMessageResponse) => {
