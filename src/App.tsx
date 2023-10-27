@@ -67,6 +67,7 @@ enum State {
   IDLE,
   LISTENING,
   PROCESSING,
+  SPEAKING,
 }
 
 const savedData = Storage.load();
@@ -224,11 +225,9 @@ function App() {
   }, [defaultVoice]);
 
   const handleSendRequest = async (message : string) => {
-    console.log("Sending message:", message);
     const newMessage = {
-      message,
-      direction: 'outgoing',
-      sender: "user",
+      type: "prompt",
+      text: message,
     };
     console.log("New message: ", newMessage);
     try {
@@ -256,13 +255,13 @@ function App() {
 
   async function processMessageToChatGPT(chatMessages : any[]) {
     const apiMessages = chatMessages.map((messageObject) => {
-      const role = messageObject.sender === "ChatGPT" ? "assistant" : "user";
+      const role = messageObject.type === "prompt" ? "user" : "assistant";
       console.log("Role: ", role);
-      console.log("Message: ", messageObject.message);
+      console.log("Message: ", messageObject.text);
       if (messageObject.message === undefined) {
         return {role, content: ""}
       }
-      return { role, content: messageObject.message };
+      return { role, content: messageObject.text };
     });
 
     const apiRequestBody = {
@@ -294,7 +293,6 @@ function App() {
       ...oldMessages,
       { type: 'prompt', text: finalTranscript },
     ]);
-    console.log('Sending message:', finalTranscript);
     handleSendRequest(finalTranscript);
   }, [state, finalTranscript, settings, speak]);
 
