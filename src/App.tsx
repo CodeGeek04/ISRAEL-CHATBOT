@@ -220,7 +220,7 @@ function App() {
       ...oldMessages,
       { type: 'prompt', text: finalTranscript },
     ]);
-
+    console.log('Sending message:', finalTranscript);
     const host = Config.IS_LOCAL_SETUP_REQUIRED
       ? `${settings.host}:${settings.port}`
       : Config.API_HOST;
