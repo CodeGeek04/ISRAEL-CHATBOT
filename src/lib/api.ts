@@ -7,6 +7,7 @@ class APIClient {
   sendMessage(host: string, payload: SendMessagePayload) {
     const abortController = new AbortController();
 
+    console.log("Host: ", host);
     const response = fetch(`${host}/api/chatbot`, {
       method: 'POST',
       headers: {
