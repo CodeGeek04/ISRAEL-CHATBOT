@@ -7,9 +7,7 @@ class APIClient {
   sendMessage(host: string, payload: SendMessagePayload) {
     const abortController = new AbortController();
 
-    console.log("Host: ", host);
-    // const response = fetch(`${host}/api/chatbot`, {
-    const response = fetch(`${host}/chatbot`, {
+    const response = fetch(`${host}/chatgpt/messages`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -17,7 +15,6 @@ class APIClient {
       body: JSON.stringify(payload),
       signal: abortController.signal,
     });
-    console.log("Response: ", response);
 
     return { response, abortController };
   }

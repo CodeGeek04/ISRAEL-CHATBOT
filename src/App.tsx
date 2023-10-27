@@ -37,6 +37,17 @@ import Storage from './lib/storage';
 import Voice from './lib/voice';
 import useVoices from './hooks/useVoices';
 
+import '@chatscope/chat-ui-kit-styles/dist/default/styles.min.css';
+import {
+  MainContainer,
+  ChatContainer,
+  MessageList,
+  // Message,
+  MessageInput,
+  TypingIndicator,
+} from '@chatscope/chat-ui-kit-react';
+const API_KEY ="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"
+
 interface CreateChatGPTMessageResponse {
   answer: string;
   messageId: string;
@@ -211,6 +222,68 @@ function App() {
     });
   }, [defaultVoice]);
 
+  const handleSendRequest = async (message : string) => {
+    console.log("Sending message:", message);
+    const newMessage = {
+      message,
+      direction: 'outgoing',
+      sender: "user",
+    };
+    console.log("New message: ", newMessage);
+    try {
+      console.log("Trying: ", message);
+      const response = await processMessageToChatGPT([...messages, newMessage]);
+      console.log("Response: ", response);
+      const content = response.choices[0]?.message?.content;
+      if (content) {
+        const chatGPTResponse = {
+          message: content,
+          sender: "ChatGPT",
+        };
+        setMessages((oldMessages) => [
+          ...oldMessages,
+          { type: 'response', text: content },
+        ]);
+        speak(content);
+        setState(State.IDLE);
+        // setIsModalVisible(false);
+      }
+    } catch (error) {
+      console.error("Error processing message:", error);
+    }
+  };
+
+  async function processMessageToChatGPT(chatMessages : any[]) {
+    const apiMessages = chatMessages.map((messageObject) => {
+      const role = messageObject.sender === "ChatGPT" ? "assistant" : "user";
+      console.log("Role: ", role);
+      console.log("Message: ", messageObject.message);
+      if (messageObject.message === undefined) {
+        return {role, content: ""}
+      }
+      return { role, content: messageObject.message };
+    });
+
+    const apiRequestBody = {
+      "model": "gpt-3.5-turbo",
+      "messages": [
+        { role: "system", content: "I'm a Student using ChatGPT for learning" },
+        ...apiMessages,
+      ],
+    };
+
+    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Authorization": "Bearer " + API_KEY,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(apiRequestBody),
+    });
+
+    return response.json();
+  }
+
   useEffect(() => {
     if (state !== State.PROCESSING || !finalTranscript) {
       return;
@@ -221,52 +294,7 @@ function App() {
       { type: 'prompt', text: finalTranscript },
     ]);
     console.log('Sending message:', finalTranscript);
-    const host = Config.IS_LOCAL_SETUP_REQUIRED
-      ? `${settings.host}:${settings.port}`
-      : Config.API_HOST;
-    const { response, abortController } = API.sendMessage(host, {
-      text: finalTranscript,
-      parentMessageId: conversationRef.current.currentMessageId || undefined,
-    });
-    abortRef.current = abortController;
-    console.log('Abort controller:', abortController);
-    console.log("Response", response);
-    response
-      .then((res) => res.json())
-      .then((res: CreateChatGPTMessageResponse) => {
-        conversationRef.current.currentMessageId = res.messageId;
-        setMessages((oldMessages) => [
-          ...oldMessages,
-          { type: 'response', text: res.answer },
-        ]);
-        speak(res.answer);
-      })
-      .catch((err: unknown) => {
-        console.warn(err);
-        let response: string;
-
-        // Ignore aborted request
-        if (abortController.signal.aborted) {
-          return;
-        }
-
-        // Connection refused
-        if (err instanceof TypeError && Config.IS_LOCAL_SETUP_REQUIRED) {
-          response =
-            'Local server needs to be set up first. Click on the Settings button to see how.';
-          setIsTooltipVisible(true);
-        } else {
-          response = 'Failed to get the response, please try again.';
-        }
-        setMessages((oldMessages) => [
-          ...oldMessages,
-          { type: 'response', text: response },
-        ]);
-        speak(response);
-      })
-      .finally(() => {
-        setState(State.IDLE);
-      });
+    handleSendRequest(finalTranscript);
   }, [state, finalTranscript, settings, speak]);
 
   if (!browserSupportsSpeechRecognition) {
